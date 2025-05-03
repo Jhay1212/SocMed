@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -15,3 +16,25 @@
 }
 
 
+@layer base {
+  * {
+    @apply box-border m-0 p-0 
+  }
+}
+
+
+@layer utilities{
+  .nav_link {
+    @apply  text-blue-400 px-[15px] py-5 block border border-x-1 border-blue-100 sm:py-2.5 sm:px-2
+  }
+  .nav_link:hover {
+    @apply bg-blue-400 text-white
+  }
+}
+
+
+@layer components {
+  .card {
+    @apply bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg sm:w-full mb-2
+  }
+}

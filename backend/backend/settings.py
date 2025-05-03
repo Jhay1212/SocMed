@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     # apps
     'api',
     'post',
+    'myuser',
 
     # third-party
     'rest_framework',
@@ -59,6 +60,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+CORS_ORIGIN_ALLOW_ALL = True
+AUTH_USER_MODEL = 'myuser.User'
 
 ROOT_URLCONF = 'backend.urls'
 
