@@ -1,2 +1,4 @@
 .env
 .sqlite3
+banned_words.json
+db.sqlite3
