@@ -1,7 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from PIL import Image
+from .manager import UserManager
 
+from django.urls import reverse
 
 def upload_to(instance, filename):
     return 'users/{filename}'.format(filename=filename)
@@ -10,6 +12,19 @@ def upload_to(instance, filename):
 class User(AbstractUser):
     profile = models.ImageField(null=True, blank=True, upload_to=upload_to)
     birth_date = models.DateField(null=True, blank=True)
+    def get_absolute_url(self):
+        return reverse('profile', kwargs={'pk': self.id})
+    
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        img = Image.open(self.profile.path)
+
+        if img.height > 300 or img.width > 300:
+            output_size = (300, 300)
+            img.thumbnail(output_size)
+            img.save(self.profile.path)
+    objects = UserManager()
 
 
 class FollowedUser(models.Model):

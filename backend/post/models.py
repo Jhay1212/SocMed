@@ -1,12 +1,24 @@
 from django.db import models
+from django.core.exceptions import ValidationError
 from myuser.models import User
-from django.core.errors import ValidationError
+import os 
 import json 
+from pathlib import Path
 
-with open('banned_slurs.json') as f:
+BASE_DIR = Path(__file__).resolve().parent.parent
+with open(os.path.join(BASE_DIR, 'post', 'banned_words.json')) as f:
     BANNED_SLURS = json.load(f)['bag_of_slurs']
 
 
+
+def  censor_profanity(content: list):
+    for i in  content:
+        if i.lower() in BANNED_SLURS:
+            print(i)
+            for letter in i:
+                if letter.isalpha():
+                    content = content.replace(letter, '*')
+                    raise ValidationError('Your post contains profanity')
 
 class DateTime(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
@@ -19,7 +31,7 @@ class DateTime(models.Model):
     class Meta:
         abstract = True
 
-class Post(models.Model, DateTime):
+class Post(DateTime):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts')
     title = models.CharField(max_length=200,  null=False, blank=False)
     content = models.CharField(max_length=256)
@@ -29,21 +41,8 @@ class Post(models.Model, DateTime):
 
 
     def clean(self):
-        for i in self.title.split():
-            if i.lower() in BANNED_SLURS:
-                for letter in i:
-                    if letter.isalpha():
-                        title = self.title.replace(letter, '*')
-                        self.title = title
-            raise ValidationError('Post title contains profanity')
-
-        for i in self.content.split():
-            if i.lower() in BANNED_SLURS:
-                for letter in i:
-                    if letter.isalpha():
-                        content = self.content.replace(letter, '*')
-                        self.content = content
-                    raise ValidationError('Post body contains profanity')
+        self.title  = censor_profanity(self.title.split())
+        self.content = censor_profanity(self.content.split())
 
     def post_create(*, title  , content, media, user):
         obj = Post(title=title, content=content, media=media, user=user)
@@ -55,7 +54,7 @@ class Post(models.Model, DateTime):
         return self.title
     
 
-class Comments(models.Model, DateTime):
+class Comments(DateTime):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments')
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
     content = models.CharField(max_length=256)
