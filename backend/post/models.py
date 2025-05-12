@@ -1,6 +1,9 @@
 from django.db import models
+import uuid
 from django.core.exceptions import ValidationError
 from myuser.models import User
+from django.utils.translation import gettext_lazy as _
+
 import os 
 import json 
 from pathlib import Path
@@ -11,53 +14,51 @@ with open(os.path.join(BASE_DIR, 'post', 'banned_words.json')) as f:
 
 
 
-def  censor_profanity(content: list):
-    for i in  content:
-        if i.lower() in BANNED_SLURS:
-            print(i)
-            for letter in i:
-                if letter.isalpha():
-                    content = content.replace(letter, '*')
-                    raise ValidationError('Your post contains profanity')
+def censor_profanity(string):
+    list_of_words = string.split()
+    for word in list_of_words:
+        if word.lower() in BANNED_SLURS:
+            string = string.replace(word, '*' * len(word))
+    return string
 
 class DateTime(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
 
-    def clean(self):
-        if  self.date_created > self.date_updated:
-            raise ValidationError('Date created cannot be before date updated')
+    # def clean(self):
+    #     if  self.date_created > self.date_updated:
+    #         raise ValidationError('Date created cannot be before date updated')
 
     class Meta:
         abstract = True
 
 class Post(DateTime):
+    # uuid_field = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts')
-    title = models.CharField(max_length=200,  null=False, blank=False)
-    content = models.CharField(max_length=256)
+    title = models.CharField(
+        _('title'),max_length=200,  null=True, blank=False)
+    content = models.CharField(_('content'),max_length=256)
     likes = models.IntegerField(default=0)
     dislike = models.IntegerField(default=1)
     media = models.ImageField(null=True, blank=True)
 
 
     def clean(self):
-        self.title  = censor_profanity(self.title.split())
-        self.content = censor_profanity(self.content.split())
+        self.title  = censor_profanity(self.title)
+        self.content = censor_profanity(self.content)
 
-    def post_create(*, title  , content, media, user):
-        obj = Post(title=title, content=content, media=media, user=user)
-        obj.full_clean()
-        obj.save()
-        return obj
-
+    def save(self, force_insert = ..., force_update = ..., using = ..., update_fields = ...):
+        self.full_clean()
+        super().save()
     def __str__(self):
         return self.title
     
 
 class Comments(DateTime):
+    # c_uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments')
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
-    content = models.CharField(max_length=256)
+    content = models.CharField(_('content'), max_length=256)
 
     def clean(self):
         for i in self.content.split():
