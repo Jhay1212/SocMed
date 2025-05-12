@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from post.models import Post, Comment
+from post.models import Post, Comments
 from myuser.models import User, FollowedUser
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import get_user_model
@@ -70,5 +70,5 @@ class FollowedUserSerializer(serializers.ModelSerializer):
 
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Comment
+        model = Comments
         fields = ['id', 'content', 'date_created', 'date_updated', 'user', 'post']

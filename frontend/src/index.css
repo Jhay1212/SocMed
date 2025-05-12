@@ -21,17 +21,20 @@
     @apply box-border m-0 p-0 
   }
   html, body {
-    @apply h-screen w-screen
+    @apply min-h-full w-screen
   }
 }
 
 
 @layer utilities{
   .nav_link {
-    @apply text-blue-400 px-[15px] py-5 block border border-x-1 border-blue-100 sm:py-2.5 sm:px-2 md:py-3 md:px-3 text-xl text-right
+    @apply text-lime-50 px-[15px] py-5 block border border-x-1 border-blue-100 sm:py-2.5 sm:px-2 md:py-3 md:px-3 text-xl text-right
   }
   .nav_link:hover {
     @apply bg-blue-100 
+  }
+  .btn-primary {
+    @apply bg-blue-400 text-white px-4 py-2 rounded-lg m-3 
   }
 }
 
@@ -40,4 +43,5 @@
   .card {
     @apply bg-white   sm:h-[8rem]  md:h-[18rem] rounded-lg overflow-hidden shadow-md hover:shadow-lg sm:w-full mb-2 w-1/4 text-black 
   }
+  
 }
