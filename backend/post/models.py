@@ -39,9 +39,9 @@ class Post(DateTime):
         _('title'),max_length=200,  null=True, blank=False)
     content = models.CharField(_('content'),max_length=256)
     likes = models.IntegerField(default=0)
-    dislike = models.IntegerField(default=1)
+    dislike = models.IntegerField(default=0)
     media = models.ImageField(null=True, blank=True)
-
+    # video_url = models.URLField(null=True, blank=True)
 
     def clean(self):
         self.title  = censor_profanity(self.title)

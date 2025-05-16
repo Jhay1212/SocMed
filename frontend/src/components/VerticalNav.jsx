@@ -1,5 +1,7 @@
 import {useState, useEffect} from 'react'
 import burger from '../assets/burger-menu.svg'
+import home from '../assets/home.svg';
+import search from '../assets/search.svg';
 const VerticalNav = () => {
   const [isOpen , setIsOpen] = useState(false)
   const handleHide = () => setIsOpen(!isOpen)
@@ -13,8 +15,13 @@ const VerticalNav = () => {
             
             <img src={burger} alt="burger" className='h-5 w-4' /></button></li>
 
-            <li className='nav_item'><a href='#'  className='nav_link '>HOME</a></li>
-            <li className='nav_item'><a href='#'  className='nav_link'>SEARCH</a></li>
+            <li className='nav_item flex-center gap-4 md:gap-2 w-full'>
+              <img src={home} className='h-5 w-5' alt="home" />
+              <a href='#'  className='nav_link'>
+              HOME</a></li>
+            <li className='nav_item flex-center gap-4'>
+              <img src={search} className="h-5 w-5" alt="" srcset="" />
+              <a href='#'  className='nav_link'>SEARCH</a></li>
             <li className='nav_item'><a href='#'  className='nav_link'>adsasdad</a></li>
             <li className='nav_item'><a href='#'  className='nav_link'>adsasdad</a></li>
 
