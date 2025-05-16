@@ -64,12 +64,11 @@ class Comments(DateTime):
     content = models.CharField(_('content'), max_length=256)
 
     def clean(self):
-        for i in self.content.split():
-            if i.lower() in BANNED_SLURS:
-                for letter in i:
-                    if letter.isalpha():
-                        content = self.content.replace(letter, '*')
-                        self.content = content
-                    raise ValidationError('Post body contains profanity')
+        self.content = censor_profanity(self.content)
+        
+    def save(self, force_insert = ..., force_update = ..., using = ..., update_fields = ...):
+        self.full_clean()
+        return super().save(force_insert, force_update, using, update_fields)
+                
     def __str__(self):
         return self.content

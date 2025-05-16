@@ -1,20 +1,20 @@
-from django.db.models import Q, BaseManager
+from django.db import models
+from django.db.models import Q
 
-class PostManager(BaseManager):
+class PostManager(models.Manager):
     def search(self, query=None):
         if query is None:
             return self.get_queryset().none()
         lookups = Q(title__icontains=query) | Q(content__icontains=query)
         return self.get_queryset().filter(lookups)
-    
-    def get_all_posts(self):
-        return self.get_queryset().all()
+
     
     def get_random_post(self):
-        return self.get_queryset().order_by('?').all()
+        return self.get_queryset().order_by('?')
     
-    def get_all_comments_by_post(self, post_id):
-        return self.get_queryset().filter(post=post_id).all()
+    def get_all_comments(self, post_id):
+        obj = self.get_queryset().get(id=post_id)
+        return obj.comments.all()
     
-    def get_trending (self):
-        return self.get_queryset().order_by('-likes').all()
+    def get_trending(self):
+        return self.get_queryset().order_by('-likes')
