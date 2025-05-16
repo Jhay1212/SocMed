@@ -1,12 +1,14 @@
 from django.db import models
-import uuid
 from django.core.exceptions import ValidationError
 from myuser.models import User
 from django.utils.translation import gettext_lazy as _
 
+import uuid
 import os 
 import json 
 from pathlib import Path
+
+from .manager import PostManager
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 with open(os.path.join(BASE_DIR, 'post', 'banned_words.json')) as f:
@@ -50,9 +52,10 @@ class Post(DateTime):
     def save(self, force_insert = ..., force_update = ..., using = ..., update_fields = ...):
         self.full_clean()
         super().save()
+
     def __str__(self):
         return self.title
-    
+    objects = PostManager()
 
 class Comments(DateTime):
     # c_uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
