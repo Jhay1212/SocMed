@@ -4,7 +4,7 @@ from .models import Post, Comments
 
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
-    list_display = ('title', 'content', 'media', 'date_created', 'date_updated')
+    list_display = ('title', 'content', 'media', 'date_created', 'date_updated', 'uuid_field')
 
 
 @admin.register(Comments)

@@ -6,7 +6,7 @@ from .manager import UserManager
 from django.urls import reverse
 
 def upload_to(instance, filename):
-    return 'users/{filename}'.format(filename=filename)
+    return 'users/profile/{username}/{filename}'.format(username=instance.username, filename=filename)
 
 
 class User(AbstractUser):

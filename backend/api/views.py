@@ -7,7 +7,12 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import status
-from .serializers import PostSerializer, UserSerializer, RegisterSerializer, CustomTokenObtainPairSerializer
+from community.models import Community
+from .serializers import (PostSerializer, 
+                          UserSerializer, 
+                          RegisterSerializer,
+                           CommentSerializer,
+                            CustomTokenObtainPairSerializer)
 # Create your views here.
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
@@ -71,3 +76,9 @@ class RegisterAPIView(APIView):
                 return Response(status=status.HTTP_205_RESET_CONTENT)
             except Exception as e:
                 return Response(status=status.HTTP_400_BAD_REQUEST)
+            
+
+class CommunityViewSet(ModelViewSet):
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    queryset = Community.objects.all()
+    serializer_class = CommunitySerializer

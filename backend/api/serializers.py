@@ -4,6 +4,8 @@ from myuser.models import User, FollowedUser
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from community.models import Community
+
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -17,17 +19,24 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         
         return token
 class PostSerializer(serializers.ModelSerializer):
+    queryset = Post.objects.all().order_by('?')
+    media = serializers.ImageField(use_url=True, required=False)
+    user = serializers.ReadOnlyField(source='user.username')
     class Meta:
         model = Post
         fields = ['id', 'title', 'content', 'likes', 'dislike', 'media', 'date_created', 'date_updated', 'user']
 
 
+    
+
+
 class UserSerializer(serializers.ModelSerializer):
     followers = serializers.SerializerMethodField()
+    profile = serializers.ImageField(use_url=True, required=False)
     followed = serializers.SerializerMethodField()
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'password']
+        fields = ['id', 'username', 'email', 'password', 'profile']
 
     def get_followers(self):
         return [user.username for user in self.followers.all()]
@@ -69,6 +78,15 @@ class FollowedUserSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
+    owner = serializers.ReadOnlyField(source='user.username')
+
     class Meta:
         model = Comments
-        fields = ['id', 'content', 'date_created', 'date_updated', 'user', 'post']
+        fields = ['id', 'content', 'date_created', 'date_updated', 'owner', 'post']
+
+class CommunitySerializer(serializers.ModelSerializer):
+    users = serializers.ReadOnlyField(source='users.all')
+    logo = serializers.ImageField(use_url=True, required=False)
+    class Meta:
+        model = Community
+        fields = ['id', 'name', 'description', 'logo', 'users']

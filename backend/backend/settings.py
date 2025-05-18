@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'api',
     'post',
     'myuser',
+    'community',
 
     # third-party
     'rest_framework',
@@ -126,6 +127,8 @@ USE_I18N = True
 
 USE_TZ = True
 
+MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_URL = '/media/'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
