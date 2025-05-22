@@ -1,14 +1,14 @@
 const Post = ({ user, title, content, date_created, media, profile }) => {
   return (
-    <div className="card mx-auto p-6 mb-4 border border-white/20 bg-gray-800 text-white rounded-lg shadow-lg max-w-2xl">
+    <div className="card w-[80%] md:w-full mx-auto p-6 mb-4 border h-[85%] border-white/20 bg-gray-800 text-white rounded-lg shadow-lg max-w-2xl">
       
-      <div className="flex items-center gap-3 mb-4">
+      <div className="flex items-center gap-3 mb-4"> 
         <img 
           src={profile} 
           alt={`${user}'s profile`} 
-          className="h-10 w-10 rounded-full object-cover border border-white/30"
+          className="h-8 w-10 rounded-full object-cover border border-white/30"
         />
-        <h2 className="text-xl font-semibold">{user}</h2>
+        <h2 className="text-xl font-bold">{user}</h2>
       </div>
 
       <h3 className="text-2xl font-bold mb-2">{title}</h3>
@@ -27,7 +27,7 @@ const Post = ({ user, title, content, date_created, media, profile }) => {
         </div>
       )}
 
-      <div className="text-sm text-gray-400">
+      <div className="text-sm self-end text-gray-400">
         Posted on: {new Date(date_created).toLocaleDateString()}
       </div>
     </div>

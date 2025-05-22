@@ -30,7 +30,7 @@ const Register = () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:8000/api/user/register', {
+      const response = await axios.post('http://localhost:8000/api/register/', {
         username: data.username,
         email: data.email,
         password: data.password
@@ -45,13 +45,13 @@ const Register = () => {
         password2: ''
       })
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed.')
+      setError(err.response?.data?.message || 'Error')
       console.error(err)
     }
   }
 
   return (
-    <main className="max-w-screen h-screen flex justify-center items-center bg-gray-100">
+    <main className="max-w-screen h-screen flex justify-center items-center bg-gray-100 text-black">
       <div className="wrapper w-full max-w-xl p-6 rounded-lg shadow-lg bg-white">
         <h1 className="text-2xl font-extrabold text-center text-blue-600 mb-4">Register</h1>
 

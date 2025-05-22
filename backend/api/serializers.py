@@ -26,14 +26,6 @@ class CommentSerializer(serializers.ModelSerializer):
         model = Comments
         fields = ['id', 'content', 'date_created', 'date_updated', 'owner', 'post']
 
-class PostSerializer(serializers.ModelSerializer):
-    comments = serializers.StringRelatedField(many=True)
-    queryset = Post.objects.all().order_by('?')
-    media = serializers.ImageField(use_url=True, required=False)
-    user = serializers.ReadOnlyField(source='user.username')
-    class Meta:
-        model = Post
-        fields = ['id', 'title', 'content', 'likes', 'dislike', 'media', 'date_created', 'date_updated', 'user', 'comments']
 
 
 
@@ -54,6 +46,16 @@ class UserSerializer(serializers.ModelSerializer):
         return [user.username for user in self.following.all()]
     
 
+
+class PostSerializer(serializers.ModelSerializer):
+    comments = serializers.StringRelatedField(many=True)
+    queryset = Post.objects.all().order_by('?')
+    media = serializers.ImageField(use_url=True, required=False)
+    user = UserSerializer(read_only=True)
+    class Meta:
+        model = Post
+        fields = ['id', 'title', 'content', 'likes', 'dislike', 'media', 'date_created', 'date_updated', 'user', 'comments']
+
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True)
     password2 = serializers.CharField(write_only=True, required=True)
@@ -64,6 +66,9 @@ class RegisterSerializer(serializers.ModelSerializer):
 
         return attrs
     
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'password', 'password2']
 
     def create(self, validated_data):
         validated_data.pop('password2') 

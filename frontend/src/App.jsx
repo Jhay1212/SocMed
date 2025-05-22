@@ -124,17 +124,17 @@ const handleChange = (e) => {
         {post.map((post, index) => (
          
             <Post key={index} 
-            user={post.user}
+            user={post.user.username}
              title={post.title} content={post.content} 
              date_created={post.date_created} 
              media={post.media}
-             profile={post.profile}
+             profile={post.user.profile}
              />
         ))}
 
         </main>
 
-        <section>
+        <section className='none hidden md:block'>
           <Trending />
         </section>
       </div>

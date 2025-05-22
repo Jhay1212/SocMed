@@ -9,6 +9,9 @@ router.register(r'users', UserViewSet)
 router.register(r'communities', CommunityViewSet)
 router.register(r'comments', CommentViewSet)
 # 
-url_patterns = [
-    # path('', include(router.urls)),
+auth_urls = [
+    path('logout/', LogoutView.as_view(), name='logout'),
+    path('register/', RegisterAPIView.as_view(), name='register'),
 ]
+
+urlpatterns = router.urls + auth_urls
