@@ -48,6 +48,7 @@ INSTALLED_APPS = [
 
     # third-party
     'rest_framework',
+    'django_extensions',
     'djoser',
     'corsheaders',
      'rest_framework_simplejwt',

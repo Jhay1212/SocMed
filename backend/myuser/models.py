@@ -2,15 +2,17 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from PIL import Image
 from .manager import UserManager
+from django.conf import settings
 
 from django.urls import reverse
+import os
 
 def upload_to(instance, filename):
     return 'users/profile/{username}/{filename}'.format(username=instance.username, filename=filename)
 
 
 class User(AbstractUser):
-    profile = models.ImageField(null=True, blank=True, upload_to=upload_to)
+    profile = models.ImageField(null=True, blank=True, upload_to=upload_to, default=os.path.join(settings.MEDIA_ROOT, 'users/profile/default/avatar.png'))
     birth_date = models.DateField(null=True, blank=True)
     def get_absolute_url(self):
         return reverse('profile', kwargs={'pk': self.id})

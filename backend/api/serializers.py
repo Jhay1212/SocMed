@@ -1,11 +1,11 @@
 from rest_framework import serializers
-from post.models import Post, Comments
-from myuser.models import User, FollowedUser
-from rest_framework.permissions import IsAuthenticated
-from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from community.models import Community
+from rest_framework.response import Response
+from rest_framework import status
 
+from post.models import Post, Comments
+from myuser.models import User, FollowedUser
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -18,31 +18,40 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         token['email'] = user.email
         
         return token
+    
+class CommentSerializer(serializers.ModelSerializer):
+    owner = serializers.ReadOnlyField(source='user.username')
+
+    class Meta:
+        model = Comments
+        fields = ['id', 'content', 'date_created', 'date_updated', 'owner', 'post']
+
 class PostSerializer(serializers.ModelSerializer):
+    comments = serializers.StringRelatedField(many=True)
     queryset = Post.objects.all().order_by('?')
     media = serializers.ImageField(use_url=True, required=False)
     user = serializers.ReadOnlyField(source='user.username')
     class Meta:
         model = Post
-        fields = ['id', 'title', 'content', 'likes', 'dislike', 'media', 'date_created', 'date_updated', 'user']
+        fields = ['id', 'title', 'content', 'likes', 'dislike', 'media', 'date_created', 'date_updated', 'user', 'comments']
 
-
-    
 
 
 class UserSerializer(serializers.ModelSerializer):
-    followers = serializers.SerializerMethodField()
+    followed_users = serializers.SerializerMethodField()
     profile = serializers.ImageField(use_url=True, required=False)
-    followed = serializers.SerializerMethodField()
+    password = serializers.CharField(write_only=True, required=False)
+
+
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'password', 'profile']
+        fields = ['id', 'username', 'email', 'password', 'profile', 'followed_users']
 
-    def get_followers(self):
-        return [user.username for user in self.followers.all()]
+    def get_followed_users(self, obj):
+        return [user.username for user in obj.followed_users.all()]
 
-    def get_followed(self, obj):
-        return [user.username for user in self.followed.all()]
+    def get_following(self, obj):
+        return [user.username for user in self.following.all()]
     
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -61,28 +70,16 @@ class RegisterSerializer(serializers.ModelSerializer):
         user =User.objects.create_user(validated_data['username'], validated_data['email'], validated_data['password'])
         return user
         
-    class Meta:
-        model = User
-        fields = ['id', 'username', 'email', 'password']
 
 
-# class LoginSerializer(serializers.Serializer):
-#     username = serializers.CharField()
-#     password = serializers.CharField()
 
-#     class Meta:
+
 class FollowedUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = FollowedUser
         fields = ['id', 'follower', 'followed']
 
 
-class CommentSerializer(serializers.ModelSerializer):
-    owner = serializers.ReadOnlyField(source='user.username')
-
-    class Meta:
-        model = Comments
-        fields = ['id', 'content', 'date_created', 'date_updated', 'owner', 'post']
 
 class CommunitySerializer(serializers.ModelSerializer):
     users = serializers.ReadOnlyField(source='users.all')

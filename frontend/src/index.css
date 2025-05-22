@@ -5,6 +5,9 @@
   line-height: 1.5;
   font-weight: 400;
 
+  --var-blue-primary: #1e2a3a;
+  --text-primary: #384a53;
+
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
   background-color: #242424;
@@ -28,11 +31,12 @@
 
 @layer utilities{
   .nav_link {
-    @apply text-lime-50 px-[15px] py-5 block border border-x-1 border-blue-100 sm:py-2.5 sm:px-2 md:py-3 md:px-10 text-xl 
+    @apply text-lime-50 px-[15px] py-5 block sm:py-2.5 sm:px-2 md:py-3 md:px-10 text-xl  hover:text-[#adb5c1]
   }
-  .nav_link:hover {
-    @apply bg-blue-100 
+  .bg-primary {
+    @apply bg-[#1e2a3a] text-white
   }
+
   .btn-primary {
     @apply bg-blue-400 text-white px-4 py-2 rounded-lg m-3 
   }

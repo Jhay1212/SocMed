@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
 import Register from './Routes/Register.jsx'
+import Post from './components/Post.jsx'
 import Profile from './Routes/Profile.jsx'
 import { createBrowserRouter,RouterProvider } from 'react-router-dom'
 const router = createBrowserRouter([
@@ -21,6 +22,10 @@ const router = createBrowserRouter([
   {
     path: 'signup',
     element: <Register />,
+  },
+  {
+    path: 'post/:id',
+    element: <Post />,
   }
 
 

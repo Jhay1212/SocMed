@@ -29,10 +29,7 @@ class DateTime(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
 
-    # def clean(self):
-    #     if  self.date_created > self.date_updated:
-    #         raise ValidationError('Date created cannot be before date updated')
-
+    
     class Meta:
         abstract = True
 
@@ -60,7 +57,6 @@ class Post(DateTime):
     objects = PostManager()
 
 class Comments(DateTime):
-    # c_uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments')
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
     content = models.CharField(_('content'), max_length=256)
@@ -68,9 +64,9 @@ class Comments(DateTime):
     def clean(self):
         self.content = censor_profanity(self.content)
         
-    def save(self, force_insert = ..., force_update = ..., using = ..., update_fields = ...):
+    def save(self):
         self.full_clean()
-        return super().save(force_insert, force_update, using, update_fields)
+        super().save()
                 
     def __str__(self):
         return self.content
