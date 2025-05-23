@@ -153,3 +153,14 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
 ]
 CORS_ALLOWED_ALL_ORIGINS = True
+
+
+DJOSER = { 
+    'USER_ID_FIELD':    'email',
+    'SEND_ACTIVATION_EMAIL': False,
+    "SERIALIZERS": {
+        'user_create': 'api.serializers.RegisterSerializer',
+        'user': 'api.serializers.UserSerializer',
+
+    }
+}

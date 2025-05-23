@@ -72,7 +72,8 @@ class RegisterAPIView(APIView):
                 {'user': {
                     'id': user.id,
                     'username': user.username,
-                    'email': user.email
+                    'email': user.email,
+                    
                 },
                ' refresh': str(refresh.access_token),
                 'token': str(refresh)}

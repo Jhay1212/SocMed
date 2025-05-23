@@ -1,15 +1,23 @@
+import { GoPencil } from "react-icons/go";
+import { Link } from "react-router-dom";
+
+
 const Post = ({ user, title, content, date_created, media, profile }) => {
   return (
     <div className="card w-[80%] md:w-full mx-auto p-6 mb-4 border h-[85%] border-white/20 bg-gray-800 text-white rounded-lg shadow-lg max-w-2xl">
+     
+     <div className="flex justify-between mb-2  border-red-800">
       
       <div className="flex items-center gap-3 mb-4"> 
         <img 
           src={profile} 
           alt={`${user}'s profile`} 
-          className="h-8 w-10 rounded-full object-cover border border-white/30"
-        />
+          className="h-20 w-20 rounded-full object-cover border border-white/30"
+          />
         <h2 className="text-xl font-bold">{user}</h2>
       </div>
+      <GoPencil />
+          </div>
 
       <h3 className="text-2xl font-bold mb-2">{title}</h3>
 

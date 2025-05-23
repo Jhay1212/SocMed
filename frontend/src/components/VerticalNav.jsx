@@ -23,7 +23,7 @@ const VerticalNav = ({onSearchClick}) => {
               </button>
               </li>
                <li className="nav_item flex-center "><img src={search} className='h-5 w-5' alt="" srcset="" /><a href='#'  className='nav_link'>Profile</a></li>
-            <li className="nav_item"><a href='#'  className='nav_link'>Settings</a></li>
+            <li className="nav_item"><a href='#'  className='nav_link'>Community</a></li>
             <li className="nav_item"><a href='#'  className='nav_link'>Logout</a></li>
 
 

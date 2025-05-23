@@ -12,8 +12,11 @@ def upload_to(instance, filename):
 
 
 class User(AbstractUser):
+    username = models.CharField(max_length=64, unique=True)
+    email = models.EmailField(unique=True, null=True, blank=True)
     profile = models.ImageField(null=True, blank=True, upload_to=upload_to, default=os.path.join(settings.MEDIA_ROOT, 'users/profile/default/avatar.png'))
     birth_date = models.DateField(null=True, blank=True)
+    gender = models.CharField(max_length=20, null=True, blank=True, default='Not specified')
     def get_absolute_url(self):
         return reverse('profile', kwargs={'pk': self.id})
     
@@ -28,6 +31,9 @@ class User(AbstractUser):
                 output_size = (300, 300)
                 img.thumbnail(output_size)
                 img.save(self.profile.path)
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
     objects = UserManager()
 
 

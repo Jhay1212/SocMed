@@ -20,4 +20,4 @@ class Community(models.Model):
 
 
     def __str__(self):
-        return super().__str__()
+        return self.name.capitalize()
