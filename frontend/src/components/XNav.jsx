@@ -9,7 +9,7 @@ const XNav = ({onSearchClick}) => {
   return (
 
 
-    <header className="w-full h-20 bg-red-700 shadow-md">
+    <header className="w-full h-20 bg-[#384a54] shadow-md">
 
       <nav className="max-w-screen-xl mx-auto h-full flex items-center justify-around px-4">
         <ul className="flex w-full justify-between items-center">

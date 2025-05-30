@@ -52,12 +52,10 @@ class CommentViewSet(ModelViewSet):
         model = Comments
         fields = ['id', 'content', 'date_created', 'date_updated', 'user', 'post']
 
-
-class LoginAPIView(APIView):
-    def post(self, request):
-        serializer = UserSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        return Response(serializer.data)
+    def perform_create(self, serializer):
+        if self.request.user.is_authenticated():
+            serializer.save(user=self.request.user)
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
     
 class RegisterAPIView(APIView):
     permission_classes = [AllowAny]
@@ -66,7 +64,7 @@ class RegisterAPIView(APIView):
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             user = serializer.save()
-            refresh = RefreshToken.for_user()
+            refresh = RefreshToken.for_user(user=user)
             return Response(
                 
                 {'user': {
@@ -93,7 +91,13 @@ class LogoutView(APIView):
         except Exception as e:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         
+class LoginView(TokenObtainPairView):
+    permission_classes = [AllowAny]
 
+    def post(self, request, *args, **kwargs):
+        pass
+
+    
 class CommunityViewSet(ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly]
     queryset = Community.objects.all()

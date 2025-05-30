@@ -1,4 +1,4 @@
-import {useState, useEffect} from 'react'
+import {useState, useEffect, useContext, createContext} from 'react'
 import VerticalNav from './components/VerticalNav'
 import Post from './components/Post'
 import Trending from './components/Trending'
@@ -7,6 +7,9 @@ import Searchbar from './components/Searchbar'
 import {motion} from 'framer-motion'
 import upload from './assets/upload-logo.svg'
 import axios from 'axios'
+
+  export const UserContext = createContext(null);
+
 const App = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [post, setPost] = useState([]);
@@ -16,7 +19,11 @@ const App = () => {
     media: ''
 
   });
-
+  
+  const user = {
+    username: 'username',
+    profile: 'profile',
+  };
 
 
   const toggleSearchModal = () => {
@@ -37,9 +44,10 @@ const App = () => {
  
 
 const handleChange = (e) => {
+  const { name, value } = e.target
   setPostData({
     ...postData,
-    [e.target.name]: e.target.value
+    [name]: value
   })
 }
   const handleSubmit = async (e) => {
@@ -51,9 +59,9 @@ const handleChange = (e) => {
       console.log(error)
     }
   }
-  console.log(post)
+
   return (
-    <div className='w-screen h-screen'>
+    <div className='w-screen h-screen bg-[#1e2a3a]'>
       <div className={"absolute top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2 {isSearchOpen ? 'block' : 'hidden'}"}>
 
       <Searchbar />
@@ -64,8 +72,9 @@ const handleChange = (e) => {
       <div className="flex  justify-between">
         <nav className="md:block relative top-0 left-0">
           <div className="md:block hidden">
-
+          <UserContext.Provider value={user}>
           <VerticalNav  onSearchClick={toggleSearchModal}/>
+          </UserContext.Provider>
           </div>
         </nav>
 
@@ -121,6 +130,9 @@ const handleChange = (e) => {
 </div>
 
 
+
+      <UserContext.Provider value={user}>
+
         {post.map((post, index) => (
          
             <Post key={index} 
@@ -131,6 +143,7 @@ const handleChange = (e) => {
              profile={post.user.profile}
              />
         ))}
+        </UserContext.Provider>'
 
         </main>
 

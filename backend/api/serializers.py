@@ -3,10 +3,12 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from community.models import Community
 from rest_framework.response import Response
 from rest_framework import status
+from django.conf import settings
 
 from post.models import Post, Comments
 from myuser.models import User, FollowedUser
 
+import os 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
@@ -18,6 +20,20 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         token['email'] = user.email
         
         return token
+    
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        refresh = self.get_token(self.user)
+        data['refresh'] = str(refresh)
+        data['access'] = str(refresh.access_token)
+        data['username'] = self.user.username
+        data['email'] = self.user.email
+        
+
+        print("DEBUG: token instance:", refresh)    
+        print("DEBUG: refresh type:", type(refresh))
+        print("DEBUG: refresh as str:", str(refresh))
+        return data
     
 class CommentSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source='user.username')
@@ -57,10 +73,14 @@ class PostSerializer(serializers.ModelSerializer):
         fields = ['id','uuid_field',  'title', 'content', 'likes', 'dislike', 'media', 'date_created', 'date_updated', 'user', 'comments']
 
 class RegisterSerializer(serializers.ModelSerializer):
+    profile = serializers.ImageField(use_url=True, required=False)
     password = serializers.CharField(write_only=True, required=True)
     password2 = serializers.CharField(write_only=True, required=True)
 
     def validate(self, attrs):
+        if attrs.get('profile') is None:
+            attrs['profile'] = 'users/profile/default/avatar.png'
+
         if attrs['password'] != attrs['password2']:
             raise serializers.ValidationError({"password": "Password fields didn't match."})
 
@@ -68,7 +88,8 @@ class RegisterSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'password', 'password2']
+        fields = ['id', 'profile', 
+        'username', 'email', 'password', 'password2']
 
     def create(self, validated_data):
         validated_data.pop('password2') 
@@ -92,6 +113,7 @@ class FollowedUserSerializer(serializers.ModelSerializer):
 class CommunitySerializer(serializers.ModelSerializer):
     users = serializers.ReadOnlyField(source='users.all')
     logo = serializers.ImageField(use_url=True, required=False)
+    post = serializers.StringRelatedField(many=True)
     class Meta:
         model = Community
-        fields = ['id', 'name', 'description', 'logo', 'users']
+        fields = ['id', 'name', 'description', 'logo', 'users', 'post']

@@ -2,9 +2,10 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
-import Register from './Routes/Register.jsx'
+import Register from './Routes/Authentication/Register.jsx'
 import Post from './components/Post.jsx'
 import Profile from './Routes/Profile.jsx'
+import Login from './Routes/Authentication/Login.jsx'
 import { createBrowserRouter,RouterProvider } from 'react-router-dom'
 const router = createBrowserRouter([
   {
@@ -12,7 +13,7 @@ const router = createBrowserRouter([
     element: <App />,
   },
   {
-    path: 'profile:username',
+    path: 'profile/:username',
     element: <Profile />,
   },
   {
@@ -23,8 +24,17 @@ const router = createBrowserRouter([
     path: 'signup',
     element: <Register />,
   },
+{
+  path: 'login',
+  element: <Login />,
+},
+
   {
     path: 'post/:id',
+    element: <Post />,
+  },
+  {
+    path: 'post/:title/edit',
     element: <Post />,
   }
 

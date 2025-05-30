@@ -16,6 +16,13 @@ const Post = ({ user, title, content, date_created, media, profile }) => {
           />
         <h2 className="text-xl font-bold">{user}</h2>
       </div>
+      {localStorage.getItem('username') == user}  {
+        localStorage.getItem('username') == user && (
+          <Link to={`/edit/${title}`}>
+            <GoPencil />
+          </Link>
+        )
+      }
       <GoPencil />
           </div>
 
