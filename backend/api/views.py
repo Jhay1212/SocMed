@@ -27,7 +27,16 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 class UserViewSet(ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    lookup_field = 'username'
 
+    def retrieve(self, request, *args, **kwargs):
+        username =  kwargs.get('username')
+        try:
+            user=  User.objects.get(username=username).first()
+            serializer = UserSerializer(user)
+            return Response(serializer.data)
+        except:
+            return Response({"error": "User s    not found"}, status=status.HTTP_404_NOT_FOUND)
   
     
     
@@ -36,7 +45,9 @@ class PostViewSet(ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
 
-
+    def post(self, request, *args, **kwargs):
+        permission_classes = [IsAuthenticated]
+        return super().post(request, *args, **kwargs)
 
     def perform_create(self, serializer):
         if self.request.user.is_authenticated():

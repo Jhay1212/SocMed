@@ -10,6 +10,29 @@ from myuser.models import User, FollowedUser
 
 import os 
 
+
+
+class UserSerializer(serializers.ModelSerializer):
+    followed_users = serializers.SerializerMethodField()
+    profile = serializers.ImageField(use_url=True, required=False)
+    posts = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'profile', 'followed_users', 'posts', 'status']
+
+    def get_followed_users(self, obj):
+        return [user.username for user in obj.followed_users.all()]
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'password', 'profile', 'followed_users', 'posts']
+
+    def get_followed_users(self, obj):
+        return [user.username for user in obj.followed_users.all()]
+
+    def get_following(self, obj):
+        return [user.username for user in self.following.all()]
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
@@ -22,17 +45,20 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         return token
     
     def validate(self, attrs):
+        """
+        Custom validation method for the CustomTokenObtainPairSerializer.
+        This method takes the validated data from the super().validate() and adds the refresh token,
+        access token, username and email to the response data.
+        It returns the updated data.
+        """
         data = super().validate(attrs)
         refresh = self.get_token(self.user)
         data['refresh'] = str(refresh)
         data['access'] = str(refresh.access_token)
         data['username'] = self.user.username
         data['email'] = self.user.email
+        data['user']= UserSerializer(self.user).data
         
-
-        print("DEBUG: token instance:", refresh)    
-        print("DEBUG: refresh type:", type(refresh))
-        print("DEBUG: refresh as str:", str(refresh))
         return data
     
 class CommentSerializer(serializers.ModelSerializer):
@@ -44,33 +70,19 @@ class CommentSerializer(serializers.ModelSerializer):
 
 
 
-
-class UserSerializer(serializers.ModelSerializer):
-    followed_users = serializers.SerializerMethodField()
-    profile = serializers.ImageField(use_url=True, required=False)
-    password = serializers.CharField(write_only=True, required=False)
-
-
-    class Meta:
-        model = User
-        fields = ['id', 'username', 'email', 'password', 'profile', 'followed_users']
-
-    def get_followed_users(self, obj):
-        return [user.username for user in obj.followed_users.all()]
-
-    def get_following(self, obj):
-        return [user.username for user in self.following.all()]
     
 
 
 class PostSerializer(serializers.ModelSerializer):
-    comments = serializers.StringRelatedField(many=True)
-    queryset = Post.objects.all().order_by('?')
-    media = serializers.ImageField(use_url=True, required=False)
     user = UserSerializer(read_only=True)
+    comments = serializers.StringRelatedField(many=True)
+    media = serializers.ImageField(use_url=True, required=False)
+
     class Meta:
         model = Post
         fields = ['id','uuid_field',  'title', 'content', 'likes', 'dislike', 'media', 'date_created', 'date_updated', 'user', 'comments']
+
+
 
 class RegisterSerializer(serializers.ModelSerializer):
     profile = serializers.ImageField(use_url=True, required=False)

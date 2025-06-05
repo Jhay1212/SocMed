@@ -52,6 +52,8 @@ INSTALLED_APPS = [
     'djoser',
     'corsheaders',
      'rest_framework_simplejwt',
+
+     'channels'
 ]
 
 MIDDLEWARE = [
