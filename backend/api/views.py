@@ -15,8 +15,10 @@ from .serializers import (PostSerializer,
                            CommentSerializer,
                            CommunitySerializer,
                             CustomTokenObtainPairSerializer)
+from django_filters import rest_framework as filters
 
 
+from .filters import PostFilter, UserFilter, CommuntyFilter
 from post.models import Post, Comments
 from myuser.models import User
 
@@ -28,6 +30,9 @@ class UserViewSet(ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     lookup_field = 'username'
+    filter_backends = (filters.DjangoFilterBackend, )
+    filter_class = UserFilter
+    filterset_fields = ['username', 'email']
 
     def retrieve(self, request, *args, **kwargs):
         username =  kwargs.get('username')
@@ -44,6 +49,8 @@ class PostViewSet(ModelViewSet):
     permission_classes = [AllowAny]
     queryset = Post.objects.all()
     serializer_class = PostSerializer
+    filter_backends = (filters.DjangoFilterBackend,)
+    filter_class = PostFilter
 
     def post(self, request, *args, **kwargs):
         permission_classes = [IsAuthenticated]
@@ -113,3 +120,9 @@ class CommunityViewSet(ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly]
     queryset = Community.objects.all()
     serializer_class = CommunitySerializer
+    filter_backends = (filters.DjangoFilterBackend,)
+    filter_class = CommuntyFilter
+
+    class Meta:
+        model = Community
+        fields = ['id', 'name', 'description', 'logo', 'users', 'post']

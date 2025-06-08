@@ -1,8 +1,10 @@
 import { GoPencil } from "react-icons/go";
 import { Link } from "react-router-dom";
-
+import { useContext } from "react";
+import { UserContext } from "../App";
 
 const Post = ({ user, title, content, date_created, media, profile }) => {
+    const {username} = useContext(UserContext)
   return (
     <div className="card w-[80%] md:w-full mx-auto p-6 mb-4 border h-[85%] border-white/20 bg-gray-800 text-white rounded-lg shadow-lg max-w-2xl">
      

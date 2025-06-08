@@ -5,15 +5,23 @@ import App from './App.jsx'
 import Register from './Routes/Authentication/Register.jsx'
 import Post from './components/Post.jsx'
 import Profile from './Routes/Profile.jsx'
+import Logout from './Routes/Authentication/Logout.jsx'
 import Login from './Routes/Authentication/Login.jsx'
-import { createBrowserRouter,RouterProvider } from 'react-router-dom'
+import Community from './Routes/Community/Community.jsx'
+import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import NotFound from './Routes/NotFound.jsx'
 const router = createBrowserRouter([
   {
     path: '/',
     element: <App />,
   },
   {
-    path: 'profile/:username',
+    path: '*',
+    element: <NotFound />,
+  },
+
+  {
+    path: 'profile/:username?',
     element: <Profile />,
   },
   {
@@ -24,10 +32,14 @@ const router = createBrowserRouter([
     path: 'signup',
     element: <Register />,
   },
-{
-  path: 'login',
-  element: <Login />,
-},
+  {
+    path: 'logout',
+    element: <Logout />,
+  },
+  {
+    path: 'login',
+    element: <Login />,
+  },
 
   {
     path: 'post/:id',
@@ -36,7 +48,13 @@ const router = createBrowserRouter([
   {
     path: 'post/:title/edit',
     element: <Post />,
+  },
+
+  {
+    path: 'community/:name?',
+    element: <Community />,
   }
+
 
 
 ])

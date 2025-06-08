@@ -15,6 +15,11 @@ const Login = () => {
     try {
       const response = await axios.post('http://localhost:8000/auth/jwt/token', data);
       localStorage.setItem('token', response.data.access);
+      localStorage.setItem('refresh', response.data.refresh);
+      localStorage.setItem('email', data.email);
+      localStorage.setItem('user', response.data.user);
+      localStorage.setItem('profile', localStorage.getItem('user').profile);
+      localStorage.setItem('username', response.data.username);
       window.location.href = '/';
     } catch (err) {
       const message = err.response?.data?.detail || 'Login failed. Please check your credentials.';

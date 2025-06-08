@@ -1,29 +1,31 @@
-import {useState, useEffect, useContext, createContext} from 'react'
+import { useState, useEffect, useContext, createContext, useSyncExternalStore } from 'react'
 import VerticalNav from './components/VerticalNav'
 import Post from './components/Post'
 import Trending from './components/Trending'
 import XNav from './components/XNav'
 import Searchbar from './components/Searchbar'
-import {motion} from 'framer-motion'
+import { motion } from 'framer-motion'
 import upload from './assets/upload-logo.svg'
 import axios from 'axios'
 
-  export const UserContext = createContext(null);
+export const UserContext = createContext(null);
 
 const App = () => {
+  const access = localStorage.getItem('token');
+  // useSyncExternalStore(access);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [post, setPost] = useState([]);
-  const [postData, setPostData ] = useState({
+  const [user, setUsers] = useState([]);
+  const [error, setError] = useState('');
+  const [postData, setPostData] = useState({
+    user: null,
     title: '',
     content: '',
     media: ''
 
   });
-  
-  const user = {
-    username: 'username',
-    profile: 'profile',
-  };
+
+
 
 
   const toggleSearchModal = () => {
@@ -31,119 +33,161 @@ const App = () => {
   }
 
   useEffect(() => {
-  const fetchPosts = async () => {
-    try {
-      const response = await axios.get('http://localhost:8000/api/posts/')
-      setPost(response.data)
-    } catch (error) {
-      console.log(error)
+    const fetchPosts = async () => {
+      try {
+        
+        const response = await axios.get('http://localhost:8000/api/posts/')
+        setPost(response.data)
+      } catch (error) {
+        console.log(error)
+      }
     }
-  }
-  fetchPosts()
-}, [])
- 
+    fetchPosts()
+  }, [])
 
-const handleChange = (e) => {
-  const { name, value } = e.target
-  setPostData({
-    ...postData,
-    [name]: value
-  })
-}
+
+  const handleFileChange = (e) => {
+    setPostData({
+      ...postData,
+      media: e.target.files[0],
+    });
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target
+    setPostData({
+      ...postData,
+      [name]: value
+    })
+  }
   const handleSubmit = async (e) => {
     e.preventDefault()
+    if (!access) {
+      window.location.href = '/login'
+      setError('You must be logged in to create a post')
+      return
+    }
+    if (!postData.title || !postData.content) {
+      setError('Please fill in all fields')
+      return
+    }
     try {
-      const response = await axios.post('http://localhost:8000/api/posts/')
+
+      const response = await axios.post('http://localhost:8000/api/posts/', postData)
       setPost(response.data)
-    }catch (error) {
+
+    } catch (error) {
       console.log(error)
+      alert(error)
     }
   }
+
+  useEffect(() => {
+
+    const fetchUsers = async () => {
+      try {
+        const response = await axios.get(`http://localhost:8000/api/users?username=${localStorage.getItem('username')}/`)
+        setUsers(response.data)
+        console.log(response.data)
+      } catch (error) {
+        console.log(error)
+        setError('Error fetching users')
+      }
+    }
+    fetchUsers()
+  }, [])
+
+  console.log('post data', post)
 
   return (
     <div className='w-screen h-screen bg-[#1e2a3a]'>
-      <div className={"absolute top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2 {isSearchOpen ? 'block' : 'hidden'}"}>
+      <div className={`absolute top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2 ${isSearchOpen ? 'block' : 'hidden'}`}>
 
-      <Searchbar />
+        <Searchbar />
       </div>
       <div className="block md:hidden ">
-        <XNav onSearchClick={toggleSearchModal}/>
+        <XNav onSearchClick={toggleSearchModal} />
       </div>
       <div className="flex  justify-between">
         <nav className="md:block relative top-0 left-0">
           <div className="md:block hidden">
-          <UserContext.Provider value={user}>
-          <VerticalNav  onSearchClick={toggleSearchModal}/>
-          </UserContext.Provider>
+            <UserContext.Provider value={user}>
+              <VerticalNav onSearchClick={toggleSearchModal} />
+            </UserContext.Provider>
           </div>
         </nav>
 
         <main className='flex flex-col justify-evenly'>
           <div className="w-full px-4 py-6 flex justify-center">
-  <form
-    className="w-full max-w-lg bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border border-white/20 backdrop-blur-md"
-    onSubmit={handleSubmit}
-  >
-    <div className="mb-4">
-      <label htmlFor="title" className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
-        Title
-      </label>
-      <input
-        type="text"
-        name="title"
-        id="title"
-        onChange={handleChange}
-        placeholder="Enter title"
-        className="w-full px-4 py-2 text-gray-900 dark:text-white text-sm rounded-lg bg-gray-100
+            <form
+              className="w-full max-w-lg bg-white dark:bg-gray-800 rounded-xl
+     shadow-md p-6 border border-white/20 backdrop-blur-md"
+              onSubmit={handleSubmit}
+            >
+              <div className="mb-4">
+                <label htmlFor="title" className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+                  Title
+                </label>
+                <input
+                  type="text"
+                  value={postData.title}
+                  name="title"
+                  id="title"
+                  onChange={handleChange}
+                  placeholder="Enter title"
+                  className="w-full px-4 py-2 text-gray-900 dark:text-white text-sm rounded-lg bg-gray-100
          dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:ring-blue-500 focus:border-blue-500"
-        aria-label="Title"
-        required
-      />
-    </div>
+                  aria-label="Title"
+                  required
+                />
+              </div>
 
-    <div className="mb-4">
-      <label htmlFor="content" className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
-        Content
-      </label>
-      <input
-        type="text"
-        name="content"
-        id="content"
-        onChange={handleChange}
-        placeholder="Enter content"
-        className="w-full px-4 py-2 text-gray-900 dark:text-white text-sm rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:ring-blue-500 focus:border-blue-500"
-        aria-label="Content"
-        required
-      />
-    </div>
-    <input type='file' accept='png/jpg/gif/jpeg' onChange={handleChange} name='media'/>
+              <div className="mb-4">
+                <label htmlFor="content" className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+                  Content
+                </label>
+                <input
+                  type="text"
+                  name="content"
+                  value={postData.content}
+                  id="content"
+                  onChange={handleChange}
+                  placeholder="Enter content"
+                  className="w-full px-4 py-2 text-gray-900 dark:text-white text-sm rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:ring-blue-500 focus:border-blue-500"
+                  aria-label="Content"
+                  required
+                />
+              </div>
+              <input type='file' accept='Image/png, Image/jpg, Image/gif, Image/jpeg'
+                onChange={handleFileChange}
+                name='media' />
 
-    <img src={upload} alt="upload"  className='h-10 w-10 '/>
+              <img src={upload} alt="upload" className='h-10 w-10 ' />
 
-    <button
-      type="submit"
-      className="w-full py-2 px-4 text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
-    >
-      Submit
-    </button>
-  </form>
-</div>
+              <button
+                type="submit"
+                className="w-full py-2 px-4 text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
+              >
+                Submit
+              </button>
+            </form>
+          </div>
 
 
 
-      <UserContext.Provider value={user}>
+          <UserContext.Provider value={user}>
 
-        {post.map((post, index) => (
-         
-            <Post key={index} 
-            user={post.user.username}
-             title={post.title} content={post.content} 
-             date_created={post.date_created} 
-             media={post.media}
-             profile={post.user.profile}
-             />
-        ))}
-        </UserContext.Provider>'
+            {post.map((post, index) => (
+
+              <Post key={index}
+                user={post.user.username}
+                title={post.title} content={post.content}
+                date_created={post.date_created}
+                media={post.media}
+                profile={post.user.profile}
+              />
+            ))}
+          </UserContext.Provider>'
 
         </main>
 
@@ -152,7 +196,7 @@ const handleChange = (e) => {
         </section>
       </div>
 
-      </div>
+    </div>
     // <>
     // {/* <main className='bg-neutral-400 h-screen w-screen gap-5 gap-t-0 sm:none transistion transistion-all ease-in-out text-mono'>
     // <div className='grid grid-row-3 gap-2'>  
@@ -171,7 +215,7 @@ const handleChange = (e) => {
     //      bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 
     //      dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
     //      placeholder="Write your thoughts here..."></textarea>
-        
+
     //     <div className='flex'>
     //         <motion.button whileHover={{scale: 1.1}} 
     //         className='btn btn-primary mx-auto'

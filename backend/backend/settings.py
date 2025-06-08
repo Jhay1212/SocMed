@@ -33,22 +33,26 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
+    'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
     # apps
     'api',
     'post',
+    'chat',
     'myuser',
     'community',
 
     # third-party
     'rest_framework',
     'django_extensions',
+    'django_filters',
     'djoser',
     'corsheaders',
      'rest_framework_simplejwt',
@@ -70,6 +74,7 @@ MIDDLEWARE = [
 AUTH_USER_MODEL = 'myuser.User'
 
 ROOT_URLCONF = 'backend.urls'
+SITE_ID = 1
 
 TEMPLATES = [
     {
@@ -85,7 +90,7 @@ TEMPLATES = [
         },
     },
 ]
-
+ASGI_APPLICATION = 'backend.asgi.application'
 WSGI_APPLICATION = 'backend.wsgi.application'
 
 
@@ -164,5 +169,12 @@ DJOSER = {
         'user_create': 'api.serializers.RegisterSerializer',
         'user': 'api.serializers.UserSerializer',
 
+    }
+}
+
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
     }
 }

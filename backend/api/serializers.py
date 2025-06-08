@@ -128,4 +128,4 @@ class CommunitySerializer(serializers.ModelSerializer):
     post = serializers.StringRelatedField(many=True)
     class Meta:
         model = Community
-        fields = ['id', 'name', 'description', 'logo', 'users', 'post']
+        fields = ['uuid', 'name', 'description', 'logo', 'users', 'post']
