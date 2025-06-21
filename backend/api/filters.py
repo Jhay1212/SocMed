@@ -19,3 +19,10 @@ class CommuntyFilter(filters.FilterSet):
     class Meta:
         model = Community
         fields = ['name', 'description']
+
+
+class PostFilter(filters.FilterSet):
+    class Meta:
+        model = Post
+        fields = ['title', 'content', 'user']
+

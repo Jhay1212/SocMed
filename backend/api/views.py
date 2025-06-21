@@ -42,24 +42,39 @@ class UserViewSet(ModelViewSet):
             return Response(serializer.data)
         except:
             return Response({"error": "User s    not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    def get_queryset(self):
+        queryset = User.objects.all()
+        username = self.request.query_params.get('username')
+        if username:
+            queryset = queryset.filter(username__iexact=username)
+        return queryset
   
     
     
 class PostViewSet(ModelViewSet):
     permission_classes = [AllowAny]
-    queryset = Post.objects.all()
+    queryset = Post.objects.all().order_by('?')
     serializer_class = PostSerializer
     filter_backends = (filters.DjangoFilterBackend,)
     filter_class = PostFilter
 
-    def post(self, request, *args, **kwargs):
+    def dispatch(self, request, *args, **kwargs):
+        print(self, request, *args, **kwargs)
+        print('dispatching')
+        return super().dispatch(request, *args, **kwargs)
+
+
+    def create(self, request, *args, **kwargs):
         permission_classes = [IsAuthenticated]
-        return super().post(request, *args, **kwargs)
+        return super().create(request, *args, **kwargs)
 
     def perform_create(self, serializer):
-        if self.request.user.is_authenticated():
+        if self.request.user.is_authenticated:
             serializer.save(user=self.request.user)
         return Response
+    
+    
 
 class CommentViewSet(ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly]
@@ -123,6 +138,25 @@ class CommunityViewSet(ModelViewSet):
     filter_backends = (filters.DjangoFilterBackend,)
     filter_class = CommuntyFilter
 
+    
+
     class Meta:
         model = Community
         fields = ['id', 'name', 'description', 'logo', 'users', 'post']
+
+    def get_queryset(self):
+        queryset = Community.objects.all()
+        name = self.request.query_params.get('name')
+        print(name)
+
+        if self.request.user.is_authenticated:
+            return queryset.filter(users=self.request.user)
+
+        if name:
+            filtered = queryset.filter(name__iexact=name)
+            if filtered.exists():
+                return filtered
+
+        return queryset
+
+    

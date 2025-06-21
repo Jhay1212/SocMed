@@ -8,6 +8,8 @@ class PostManager(models.Manager):
         lookups = Q(title__icontains=query) | Q(content__icontains=query)
         return self.get_queryset().filter(lookups)
 
+    def get_all_posts(self):
+        return self.get_queryset().all().order_by('?')
     
     def get_random_post(self):
         return self.get_queryset().order_by('?')

@@ -53,4 +53,6 @@ class FollowedUser(models.Model):
         ]
         ordering = ['-date_followed']
     
+    def __str__(self):
+        return self.user_id.username + ' follows ' + self.followed_user_id.username
 # Create your models here.

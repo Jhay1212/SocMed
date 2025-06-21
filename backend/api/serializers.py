@@ -4,53 +4,64 @@ from community.models import Community
 from rest_framework.response import Response
 from rest_framework import status
 from django.conf import settings
+import json
 
 from post.models import Post, Comments
 from myuser.models import User, FollowedUser
 
 import os 
 
+class FollowedUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FollowedUser
+        fields = ['id', 'follower', 'followed']
+class ProfileSerializer(serializers.ModelSerializer):
+    profile = serializers.ImageField(use_url=True, required=False)
+    class Meta:
+        model = User
+        fields =  ['username', 'email', 'profile']
+
+class PostSerializer(serializers.ModelSerializer):
+    user = ProfileSerializer(read_only=True)
+    comments = serializers.StringRelatedField(many=True)
+    likes = serializers.ReadOnlyField()
+    dislike = serializers.ReadOnlyField()
+    media = serializers.ImageField(use_url=True, required=False)
+
+    class Meta:
+        model = Post
+        fields = ['id','uuid_field',  'title', 'content', 'likes', 'dislike', 
+                  'media', 'date_created', 'date_updated', 'user', 'comments']
+
 
 
 class UserSerializer(serializers.ModelSerializer):
-    followed_users = serializers.SerializerMethodField()
+    followed_users = serializers.StringRelatedField(many=True, read_only=True)
     profile = serializers.ImageField(use_url=True, required=False)
-    posts = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    posts = PostSerializer(many=True, read_only=True)
 
     class Meta:
         model = User
         fields = ['id', 'username', 'email', 'profile', 'followed_users', 'posts', 'status']
 
     def get_followed_users(self, obj):
-        return [user.username for user in obj.followed_users.all()]
+        return [user for user in obj.followed_users.all()]
 
     class Meta:
         model = User
         fields = ['id', 'username', 'email', 'password', 'profile', 'followed_users', 'posts']
 
-    def get_followed_users(self, obj):
-        return [user.username for user in obj.followed_users.all()]
 
-    def get_following(self, obj):
-        return [user.username for user in self.following.all()]
+    
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
-        
-        # Add custom claims
         token['username'] = user.username
         token['email'] = user.email
-        
         return token
     
     def validate(self, attrs):
-        """
-        Custom validation method for the CustomTokenObtainPairSerializer.
-        This method takes the validated data from the super().validate() and adds the refresh token,
-        access token, username and email to the response data.
-        It returns the updated data.
-        """
         data = super().validate(attrs)
         refresh = self.get_token(self.user)
         data['refresh'] = str(refresh)
@@ -58,7 +69,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         data['username'] = self.user.username
         data['email'] = self.user.email
         data['user']= UserSerializer(self.user).data
-        
+        print(data)
         return data
     
 class CommentSerializer(serializers.ModelSerializer):
@@ -69,18 +80,6 @@ class CommentSerializer(serializers.ModelSerializer):
         fields = ['id', 'content', 'date_created', 'date_updated', 'owner', 'post']
 
 
-
-    
-
-
-class PostSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True)
-    comments = serializers.StringRelatedField(many=True)
-    media = serializers.ImageField(use_url=True, required=False)
-
-    class Meta:
-        model = Post
-        fields = ['id','uuid_field',  'title', 'content', 'likes', 'dislike', 'media', 'date_created', 'date_updated', 'user', 'comments']
 
 
 
@@ -115,10 +114,6 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 
 
-class FollowedUserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = FollowedUser
-        fields = ['id', 'follower', 'followed']
 
 
 
